@@ -1828,7 +1828,7 @@ buildPDALPipelineENTWINE <- function(
   # PDAL into the anaconda environment
   write("rem conda install -c conda-forge pdal -y",
 #         file = paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""))
-        file = normalizePath(file.path(pipelineOutputFolder, pipelineScript))
+        file = normalizePath(file.path(pipelineOutputFolder, pipelineScript)))
 
   sampleCount <- nrow(polys@data)
 
