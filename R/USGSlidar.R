@@ -138,7 +138,8 @@ fetchUSGSProjectIndex <- function(
   if (destfile == "") {
     # get name from URL
     t <- urltools::url_parse(url)
-    destfile <- paste(getwd(), "/", basename(t$path), sep = "")
+#     destfile <- paste(getwd(), "/", basename(t$path), sep = "")
+    destfile <- normalizePath(file.path(getwd(), basename(t$path)))
   }
 
   # download the index
@@ -247,7 +248,8 @@ fetchUSGSTileIndex <- function(
   if (destfile == "") {
     # get name from URL
     t <- urltools::url_parse(url)
-    destfile <- paste(getwd(), "/", basename(t$path), sep = "")
+#     destfile <- paste(getwd(), "/", basename(t$path), sep = "")
+    destfile <- normalizePath(file.path(getwd(), basename(t$path)))
   }
 
   # download the index
@@ -342,7 +344,8 @@ fetchUSGSTiles <- function(
 ) {
   # sort out the folder
   if (destfolder == "") {
-    destfolder <- paste(getwd(), "/", sep = "")
+#     destfolder <- paste(getwd(), "/", sep = "")
+    destfolder <- normalizePath(file.path(getwd()))
   } else {
     # make sure folder exists
     if (!base::dir.exists(file.path(destfolder))) {
@@ -352,7 +355,8 @@ fetchUSGSTiles <- function(
 
     # check from trailing slash
     if (destfolder[length(destfolder)] != "/")
-      destfolder <- paste(destfolder, "/", sep = "")
+#       destfolder <- paste(destfolder, "/", sep = "")
+      destfolder <- normalizePath(file.path(getwd()))
   }
 
   # loop through tiles and fetch
@@ -363,7 +367,8 @@ fetchUSGSTiles <- function(
     index <- 1
     for(url in urls) {
       t <- urltools::url_parse(url)
-      destfile <- paste(destfolder, basename(t$path), sep = "")
+#       destfile <- paste(destfolder, basename(t$path), sep = "")
+      destfile <- normalizePath(file.path(getwd(), basename(t$path)))
 
       # check to see if the target file already exists
       if (!base::file.exists(destfile) || refresh)
@@ -1822,7 +1827,8 @@ buildPDALPipelineENTWINE <- function(
   # write first line of the processing script...comment statement that can be used to install
   # PDAL into the anaconda environment
   write("rem conda install -c conda-forge pdal -y",
-        file = paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""))
+#         file = paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""))
+        file = normalizePath(file.path(pipelineOutputFolder, pipelineScript))
 
   sampleCount <- nrow(polys@data)
 
@@ -1845,12 +1851,20 @@ buildPDALPipelineENTWINE <- function(
     pipelineTemplatelocal[pipelineTemplatelocal$tag == "ept_reader", "threads"] <- "4"
 
     # tag:las_writer file name and compression
-    lasFile <- paste(clipOutputFolder, "\\",
-                     basename(dirname(polys@data[thePoly, URLColumnLabel])),
-                     "_",
-                     polys@data[thePoly, IDColumnLabel],
-                     pointExtension,
-                     sep = "")
+#     lasFile <- paste(clipOutputFolder, "\\",
+#                      basename(dirname(polys@data[thePoly, URLColumnLabel])),
+#                      "_",
+#                      polys@data[thePoly, IDColumnLabel],
+#                      pointExtension,
+#                      sep = "")
+    lasFile <- normalizePath(file.path(clipOutputFolder,
+                             paste(basename(dirname(polys@data[thePoly, URLColumnLabel])),
+                                   "_",
+                                   polys@data[thePoly, IDColumnLabel],
+                                   pointExtension,
+                                   sep = "")
+                             ))
+
     pipelineTemplatelocal[pipelineTemplatelocal$tag == "las_writer", "filename"] <- lasFile
 
     if (compress) {
@@ -1861,19 +1875,31 @@ buildPDALPipelineENTWINE <- function(
 
     # write pipeline file
     if (pipelineOutputFileBaseName != "") {
-      jsonFile <- paste(pipelineOutputFolder, "\\",
-                        pipelineOutputFileBaseName,
+#       jsonFile <- paste(pipelineOutputFolder, "\\",
+#                         pipelineOutputFileBaseName,
+#                         "_",
+#                         polys@data[thePoly, IDColumnLabel],
+#                         ".json",
+#                         sep = "")
+      jsonFile <- normalizePath(file.path(pipelineOutputFolder,
+                        paste(pipelineOutputFileBaseName,
                         "_",
                         polys@data[thePoly, IDColumnLabel],
                         ".json",
-                        sep = "")
+                        sep = "")))
     } else {
-      jsonFile <- paste(pipelineOutputFolder, "\\",
-                        basename(dirname(polys@data[thePoly, URLColumnLabel])),
+#       jsonFile <- paste(pipelineOutputFolder, "\\",
+#                         basename(dirname(polys@data[thePoly, URLColumnLabel])),
+#                         "_",
+#                         polys@data[thePoly, IDColumnLabel],
+#                         ".json",
+#                         sep = "")
+      jsonFile <- normalizePath(file.path(pipelineOutputFolder,
+                        paste(basename(dirname(polys@data[thePoly, URLColumnLabel])),
                         "_",
                         polys@data[thePoly, IDColumnLabel],
                         ".json",
-                        sep = "")
+                        sep = "")))
     }
     write(jsonlite::toJSON(pipelineTemplatelocal, pretty = TRUE), file = jsonFile)
 
@@ -1883,7 +1909,8 @@ buildPDALPipelineENTWINE <- function(
                 jsonFile,
                 "\"",
                 sep = ""),
-          file = paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""),
+#           file = paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""),
+          file = normalizePath(file.path(pipelineOutputFolder, pipelineScript)),
           append = TRUE)
   }
 
@@ -1891,7 +1918,8 @@ buildPDALPipelineENTWINE <- function(
   # Keep the first line in place (comment to install PDAL)
   # This will mix the dummy locations and valid locations together to help obfuscate the
   # valid plot locations.
-  commands <- utils::read.table(paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""),
+#   commands <- utils::read.table(paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""),
+  commands <- utils::read.table(normalizePath(file.path(pipelineOutputFolder, pipelineScript)),
                          sep = "\n",
                          stringsAsFactors = FALSE)
 
@@ -1901,7 +1929,8 @@ buildPDALPipelineENTWINE <- function(
     commands <- commands[order(commands$rnum),]
 
     # write the commands back to the batch file
-    write(commands[, "V1"], paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""), sep = "\r\n")
+#     write(commands[, "V1"], paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""), sep = "\r\n")
+    write(commands[, "V1"], normalizePath(file.path(pipelineOutputFolder, pipelineScript)), sep = "\n")
   }
 
   invisible(nrow(commands) - 1)
