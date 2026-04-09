@@ -4,16 +4,15 @@
 # USGSlidar
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The USGSlidar package was developed to make it somewhat easy to query
 the collection of lidar data available from the U.S. Geological Survey’s
 3D Elevation Program (and other sources) to find out if data are
-available for specific locations of interest. The package accesses some
-of the project and tile index files available from 3DEP and uses them to
-search for data. The package also provides links to lidar data files
-that can be downloaded for free directly from 3DEP servers.
+available for specific locations of interest. The package offers options
+to access the project and tile index files available from 3DEP and uses
+them to search for data. The package also provides links to lidar data
+files that can be downloaded for free directly from 3DEP servers.
 
 The package also facilitates access to the USGS lidar collection
 maintained in Entwine format. This collection contains a subset of the
@@ -43,6 +42,16 @@ for a specific extent. However, the end result is the same (provided you
 delete all the point tiles necessary to cover the desired area(s) after
 clipping data for specific areas).
 
+The package also supports querying the lidar data collection hosted on
+Microsoft Planetary Computer (MPC). This collection is a snapshot of the
+USGS 3DEP data capture late in 2022. Projects added to the USGS and
+Entwine collections after the snapshot date are not included in the MPC
+collection. The MPC data are organized as individual point tiles with
+attributes for each tile that include the lidar project name, projection
+information, and data collection start and end dates). The point data
+were projected to UTM for the snapshot with the UTM zone appropriate for
+the data location (center of the lidar project area).
+
 **This code should be considered experimental. The examples work but
 some options for functions may not work as expected. I have used the
 code for several months but I tend to use it the same way all the time
@@ -66,7 +75,7 @@ to CRAN at some point but no promises.
 not previously used **devtools**, use the commented line of code to
 install the package. Note that this will also install several additional
 packages needed for devtools. If you do not want the vignettes, set
-*build\_vignettes = FALSE*.
+*build_vignettes = FALSE*.
 
 You can install the development version from
 [GitHub](https://github.com/) with:
@@ -77,69 +86,71 @@ library(devtools)
 devtools::install_github("bmcgaughey1/USGSlidar", build_vignettes = TRUE)
 ```
 
-## Problems with USGS WESM and TESM index files
+## Potential problems with USGS WESM and TESM index files
 
-The USGS TESM tile index has problems with some lidar projects. The
-problems are related to missing or bad geometries for some tiles and
-involves \~20 lidar projects (haven’t really checked non-lidar
-projects). The queryUSGSTileIndex() function works correctly when the
-project being queried has good tiles but it may fail when there are
-missing or bad tile geometries within the project. USGS is aware of
-these problems but has been slow to correct them.
+In 2022, the USGS TESM tile index has problems with some lidar projects.
+The problems were related to missing or bad geometries for some tiles
+and involved ~20 lidar projects (haven’t checked non-lidar projects).
+The queryUSGSTileIndex() function works correctly when the project being
+queried has good tiles but it may fail when there are missing or bad
+tile geometries within the project. USGS corrected these problems as
+they were discovered but I don’t know if all projects have been
+corrected. However, I have used the TESM index for several projects
+lately and have not encountered any problems. Hopefully, this means that
+all problems with the index have been fixed.
 
-In addition, the TESM tile index does not include sufficient information
-to fully locate the tile (LAS/LAZ file) on the rockyweb server. The
-tile\_id field in the TESM index is just a tile identifier and does not
-(usually) fully identify the file on the server. The logic used to
-create the actual file names seems to vary depending on the lidar
-project. For recent projects, the actual file names appear to be
-constructed using the project name and the year the point data were
-published. Older projects do not include information for the publication
-year in the file names.
+The TESM tile index does not include sufficient information to fully
+locate the tile (LAS/LAZ file) on the rockyweb server. The tile_id field
+in the TESM index is just a tile identifier and does not (usually) fully
+identify the file on the server. The logic used to create the actual
+file names seems to vary depending on the lidar project. For recent
+projects, the actual file names appear to be constructed using the
+project name and the year the point data were published. Older projects
+do not include information for the publication year in the file names.
 
-While the WESM index contains a lpc\_link field that is presumably the
+While the WESM index contains a lpc_link field that is presumably the
 URL for the point files associated with a project, the URL is incomplete
 and does not include the actual folder containing the point files.
 Usually, the point files are in a folder named “laz” or “LAZ” but some
-projects have point files in a folder named “LAS”. The lpc\_link URLs
-are often missing the trailing “/” so code that uses them needs to check
-for the trailing “/” and add it if missing.
+projects have point files in a folder named “LAS”. The lpc_link URLs are
+often missing the trailing “/” so code that uses them needs to check for
+the trailing “/” and add it if missing.
 
 ### Example
 
 The data for Glacier Peak in Washington state is identified in WESM by:
 
-  - workunit = “WA\_GlacierPeak\_2014”
-  - workunit = 18330
-  - project = “Glacier\_Peak\_WA\_QL1\_LiDAR”
-  - project\_id = 18332
-  - lpc\_pub\_date = “2016-08-08”
-  - lpc\_link =
-    “<https://rockyweb.usgs.gov/vdelivery/Datasets/Staged/Elevation/LPC/Projects/USGS_LPC_WA_GlacierPeak_2014_LAS_2016/>”
+- workunit = “WA_GlacierPeak_2014”
+- workunit = 18330
+- project = “Glacier_Peak_WA_QL1_LiDAR”
+- project_id = 18332
+- lpc_pub_date = “2016-08-08”
+- lpc_link =
+  “<https://rockyweb.usgs.gov/vdelivery/Datasets/Staged/Elevation/LPC/Projects/USGS_LPC_WA_GlacierPeak_2014_LAS_2016/>”
 
 Data for this area were collected in 2014-2015 and published in 2016.
 The point data files area actually located in
 “<https://rockyweb.usgs.gov/vdelivery/Datasets/Staged/Elevation/LPC/Projects/USGS_LPC_WA_GlacierPeak_2014_LAS_2016/laz/>”
 and individual files names look like this:
-“USGS\_LPC\_WA\_GlacierPeak\_2014\_10TFU1514\_LAS\_2016.laz”
+“USGS_LPC_WA_GlacierPeak_2014_10TFU1514_LAS_2016.laz”
 
 The record in the TESM tile index for the same tile contains the
 following:
 
-  - tile\_id = “10TFU1514”
-  - project = “Glacier\_Peak\_WA\_QL1\_LiDAR”
-  - project\_id = 18332
-  - workunit\_id = 18330
+- tile_id = “10TFU1514”
+- project = “Glacier_Peak_WA_QL1_LiDAR”
+- project_id = 18332
+- workunit_id = 18330
 
 For this project and tile, we can construct a URL as follows (R syntax
 using lubridate package for year() function): URL \<-
-paste0(WESM$lpc\_link, “laz/”, “USGS\_LPC\_”, WESM$workunit, "\_“,
-TESM$tile\_id,”\_LAS\_“, year(WESM$lpc\_pub\_date),”.laz")
+paste0(WESM\$lpc_link, “laz/”, “USGS_LPC\_”, WESM\$workunit, “\_“,
+TESM\$tile_id,”\_LAS\_“, year(WESM\$lpc_pub_date),”.laz”)
 
-For projects where the lpc\_pub\_date is missing of set to NA, the URL
-may be as follows (but not tested for all projects): URL \<-
-paste0(WESM$lpc\_link, “laz/”, “USGS\_LPC\_”, WESM$workunit, "\_“,
-TESM$tile\_id,”.laz")
+For projects where the lpc_pub_date is missing of set to NA, the URL may
+be as follows (but not tested for all projects): URL \<-
+paste0(WESM\$lpc_link, “laz/”, “USGS_LPC\_”, WESM\$workunit, “\_“,
+TESM\$tile_id,”.laz”)
 
 ## Example – See FIAPlotExample.R in the ExampleScripts folder
 
