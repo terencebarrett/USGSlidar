@@ -161,11 +161,11 @@ buildPDALPipelineENTWINE <- function(
     pipelineTemplatelocal[pipelineTemplatelocal$tag == "ept_reader", "threads"] <- "4"
 
     # tag:las_writer file name and compression
-    lasFile <- normalizePath(clipOutputFolder,
-                     basename(dirname(polys@data[thePoly, URLColumnLabel])),
+    lasFile <- normalizePath(file.path(clipOutputFolder,
+                     paste(basename(dirname(polys@data[thePoly, URLColumnLabel])),
                      "_",
                      polys@data[thePoly, IDColumnLabel],
-                     pointExtension)
+                     pointExtension)))
 #     lasFile <- paste(clipOutputFolder, "\\",
 #                      basename(dirname(polys@data[thePoly, URLColumnLabel])),
 #                      "_",
@@ -182,17 +182,17 @@ buildPDALPipelineENTWINE <- function(
 
     # write pipeline file
     if (pipelineOutputFileBaseName != "") {
-      jsonFile <- normalizePath(pipelineOutputFolder,
-                        pipelineOutputFileBaseName,
+      jsonFile <- normalizePath(file.path(pipelineOutputFolder,
+                        paste(pipelineOutputFileBaseName,
                         "_",
                         polys@data[thePoly, IDColumnLabel],
-                        ".json")
+                        ".json")))
     } else {
-      jsonFile <- normalizePath(pipelineOutputFolder,
-                        basename(dirname(polys@data[thePoly, URLColumnLabel])),
+      jsonFile <- normalizePath(file.path(pipelineOutputFolder,
+                        paste(basename(dirname(polys@data[thePoly, URLColumnLabel])),
                         "_",
                         polys@data[thePoly, IDColumnLabel],
-                        ".json")
+                        ".json")))
     }
 #     if (pipelineOutputFileBaseName != "") {
 #       jsonFile <- paste(pipelineOutputFolder, "\\",
@@ -212,7 +212,7 @@ buildPDALPipelineENTWINE <- function(
     write(jsonlite::toJSON(pipelineTemplatelocal, pretty = TRUE), file = jsonFile)
 
     # write command to run pipeline to batch file...enclose file name in quotes
-    write(normalizePath("pdal pipeline ", jsonFile),
+    write(normalizePath(file.path("pdal pipeline ", jsonFile)),
           file = normalizePath(pipelineOutputFolder, pipelineScript),
           append = TRUE)
 #     write(paste("pdal pipeline ",
@@ -228,7 +228,7 @@ buildPDALPipelineENTWINE <- function(
   # Keep the first line in place (comment to install PDAL)
   # This will mix the dummy locations and valid locations together to help obfuscate the
   # valid plot locations.
-  commands <- utils::read.table(normalizePath(pipelineOutputFolder, pipelineScript),
+  commands <- utils::read.table(normalizePath(file.path(pipelineOutputFolder, pipelineScript),
                          sep = "\n",
                          stringsAsFactors = FALSE)
 #   commands <- utils::read.table(paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""),
@@ -241,7 +241,7 @@ buildPDALPipelineENTWINE <- function(
     commands <- commands[order(commands$rnum),]
 
     # write the commands back to the batch file
-    write(commands[, "V1"], normalizePath(pipelineOutputFolder, pipelineScript), sep = "\n")
+    write(commands[, "V1"], normalizePath(file.path(pipelineOutputFolder, pipelineScript)), sep = "\n")
 #     write(commands[, "V1"], paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""), sep = "\r\n")
   }
 
