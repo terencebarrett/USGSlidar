@@ -212,8 +212,8 @@ buildPDALPipelineENTWINE <- function(
     write(jsonlite::toJSON(pipelineTemplatelocal, pretty = TRUE), file = jsonFile)
 
     # write command to run pipeline to batch file...enclose file name in quotes
-    write(normalizePath(file.path("pdal pipeline ", jsonFile)),
-          file = normalizePath(pipelineOutputFolder, pipelineScript),
+    write(paste("pdal pipeline /", jsonFile, "/"),
+          file = normalizePath(file.path(pipelineOutputFolder, pipelineScript)),
           append = TRUE)
 #     write(paste("pdal pipeline ",
 #                 "\"",
@@ -228,7 +228,7 @@ buildPDALPipelineENTWINE <- function(
   # Keep the first line in place (comment to install PDAL)
   # This will mix the dummy locations and valid locations together to help obfuscate the
   # valid plot locations.
-  commands <- utils::read.table(normalizePath(file.path(pipelineOutputFolder, pipelineScript),
+  commands <- utils::read.table(normalizePath(file.path(pipelineOutputFolder, pipelineScript)),
                          sep = "\n",
                          stringsAsFactors = FALSE)
 #   commands <- utils::read.table(paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""),
