@@ -212,7 +212,7 @@ buildPDALPipelineENTWINE <- function(
     write(jsonlite::toJSON(pipelineTemplatelocal, pretty = TRUE), file = jsonFile)
 
     # write command to run pipeline to batch file...enclose file name in quotes
-    write(paste("pdal pipeline /", jsonFile, "/"),
+    write(paste("pdal pipeline ", "\"", jsonFile, "\"", sep = ""),
           file = normalizePath(file.path(pipelineOutputFolder, pipelineScript)),
           append = TRUE)
 #     write(paste("pdal pipeline ",
