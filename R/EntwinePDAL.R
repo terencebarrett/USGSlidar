@@ -137,7 +137,7 @@ buildPDALPipelineENTWINE <- function(
   # write first line of the processing script...comment statement that can be used to install
   # PDAL into the anaconda environment
   write("rem conda install -c conda-forge pdal -y",
-        file = normalizePath(pipelineOutputFolder, pipelineScript))
+        file = normalizePath(file.path(pipelineOutputFolder, pipelineScript)))
 #         file = paste(pipelineOutputFolder, "\\", pipelineScript, sep = ""))
 
   sampleCount <- nrow(polys@data)
