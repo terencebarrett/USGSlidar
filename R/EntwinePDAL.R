@@ -165,7 +165,7 @@ buildPDALPipelineENTWINE <- function(
                      paste(basename(dirname(polys@data[thePoly, URLColumnLabel])),
                      "_",
                      polys@data[thePoly, IDColumnLabel],
-                     pointExtension)))
+                     pointExtension), sep = ""))
 #     lasFile <- paste(clipOutputFolder, "\\",
 #                      basename(dirname(polys@data[thePoly, URLColumnLabel])),
 #                      "_",
@@ -186,13 +186,13 @@ buildPDALPipelineENTWINE <- function(
                         paste(pipelineOutputFileBaseName,
                         "_",
                         polys@data[thePoly, IDColumnLabel],
-                        ".json")))
+                        ".json"), sep = ""))
     } else {
       jsonFile <- normalizePath(file.path(pipelineOutputFolder,
                         paste(basename(dirname(polys@data[thePoly, URLColumnLabel])),
                         "_",
                         polys@data[thePoly, IDColumnLabel],
-                        ".json")))
+                        ".json"), sep = ""))
     }
 #     if (pipelineOutputFileBaseName != "") {
 #       jsonFile <- paste(pipelineOutputFolder, "\\",
