@@ -165,7 +165,7 @@ buildPDALPipelineENTWINE <- function(
                      paste(basename(dirname(polys@data[thePoly, URLColumnLabel])),
                      "_",
                      polys@data[thePoly, IDColumnLabel],
-                     pointExtension), sep = ""))
+                     pointExtension, sep = "")))
 #     lasFile <- paste(clipOutputFolder, "\\",
 #                      basename(dirname(polys@data[thePoly, URLColumnLabel])),
 #                      "_",
